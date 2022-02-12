@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import interceptors from "../services/interceptor";
 import { setLoaderOn, setLoaderOff } from "../store/reducers/appSettings";

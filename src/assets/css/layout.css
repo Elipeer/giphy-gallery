@@ -2,7 +2,7 @@
   background: aliceblue;
   border-radius: 25px;
   display: flex;
-  align-content: start;
+  align-content: flex-start;
   align-items: center;
   padding: 12px;
   color: black;
@@ -12,15 +12,22 @@
 }
 
 .image-card-size {
-  height: 400px;
+  height: 200px;
+  width: 200px;
   border-radius: 10px;
 }
 .image-card-size:hover {
   box-shadow: 0px 0px 0px 3px lightgray;
 }
 
+.center-to-image-absolute {
+  position: absolute;
+  top: 40%;
+  right: 40%;
+}
+
 .box-shadow {
-  box-shadow: 0px 0px 0px 3px red !important;
+  box-shadow: 0px 0px 0px 3px pink !important;
 }
 
 .generic-logo {
@@ -40,12 +47,9 @@
   height: 60px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
+  min-width: 380px;
 }
-
-/* .nav-links > div {
-  margin: 10px;
-} */
 
 @media only screen and (max-width: 530px) {
   .large-label {
@@ -57,5 +61,10 @@
 @media only screen and (max-width: 700px) {
   .nav-links {
     text-align: center;
+  }
+
+  .nav-con {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }

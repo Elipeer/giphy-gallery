@@ -1,17 +1,21 @@
+import { useEffect, useState } from "react";
 import { CircularProgress, TextField } from "@mui/material";
-import React, { useState } from "react";
-import { connect } from "react-redux";
-import debounce from "lodash.debounce";
+import { Search } from "@mui/icons-material";
 import giphyService from "../../services/giphyService";
 import GifCard from "../partials/GifCard";
 import Swal from "sweetalert2";
+import debounce from "lodash.debounce";
 
-const SearchGiphyPage = (props) => {
+const SearchGiphyPage = () => {
   const [isLoading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("Just eat takeaway");
   const [currentGiphys, setCurrentGiphys] = useState([]);
 
   const debounceFunc = debounce(handle, 500);
+
+  useEffect(() => {
+    handle(searchQuery);
+  }, []);
 
   return (
     <>
@@ -29,24 +33,33 @@ const SearchGiphyPage = (props) => {
               <CircularProgress size={30} />
             </div>
           )}
+          <Search />
         </div>
-        <div className="flex flex-wrap flex-center-x mt-50">
-          {currentGiphys?.map((item, i) => {
-            return (
-              <div key={item.id} className="margin13">
-                <GifCard currentImg={item} searchQuery={searchQuery} />
-              </div>
-            );
-          })}
-        </div>
+        {currentGiphys[0] ? (
+          <>
+            <p className="white-color mt-50">Click on an image to add to favorites</p>
+            <div className="flex flex-wrap flex-center-x">
+              {currentGiphys?.map((item, i) => {
+                return (
+                  <div key={item.id} className="margin13">
+                    <GifCard currentImg={item} searchQuery={searchQuery} />
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <div className="white-color">No results yet</div>
+        )}
       </div>
     </>
   );
 
   async function handle(searchQuery) {
     if (!searchQuery) return;
-    setSearchQuery(searchQuery);
     setLoading(true);
+    setSearchQuery(searchQuery);
+
     try {
       const giphys = await giphyService.getGiphysBySearchKey(searchQuery);
       setLoading(false);
@@ -55,7 +68,6 @@ const SearchGiphyPage = (props) => {
         Swal.fire("Whoops", giphys.err, "warning");
       } else if (giphys.data[0]) {
         setCurrentGiphys(giphys.data);
-        debugger;
       } else {
         Swal.fire("Whoops", "No results found", "warning");
       }
@@ -65,10 +77,4 @@ const SearchGiphyPage = (props) => {
   }
 };
 
-const mapStateToProps = (state) => {
-  return {
-    locations: state.persistedReducer.locations
-  };
-};
-
-export default connect(mapStateToProps)(SearchGiphyPage);
+export default SearchGiphyPage;

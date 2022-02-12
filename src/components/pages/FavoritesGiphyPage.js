@@ -1,32 +1,27 @@
-import { CircularProgress, MenuItem, TextField } from "@mui/material";
+import { MenuItem, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import debounce from "lodash.debounce";
-import giphyService from "../../services/giphyService";
 import GifCard from "../partials/GifCard";
-import Swal from "sweetalert2";
 
 const FavoriteGiphyPage = (props) => {
   const [currentGiphys, setCurrentGiphys] = useState([]);
   const [selectedTag, setSelectedTag] = useState("");
   const [tags, setTags] = useState([]);
+
   useEffect(() => {
-    let tagsList = [...tags];
-    if (selectedTag && selectedTag !== "all-gifs-saved") {
-      const selectedGifs = props.favoriteGiphys.filter((x) => x.tag === selectedTag);
-      setCurrentGiphys(selectedGifs);
-    } else {
-      //Fist render
-      setCurrentGiphys(props.favoriteGiphys);
-    }
-    props.favoriteGiphys?.map((item, i) => {
-      if (!tagsList.includes(item.tag)) {
-        tagsList.push(item.tag);
-      }
+    let tagsList = [];
+    let selectedGifs = props.favoriteGiphys.filter((x) => x.tag === selectedTag);
+
+    //If tag doesn't match any saved content
+    if (!selectedGifs[0]) selectedGifs = [...props.favoriteGiphys];
+    //Adding tags to tagsList
+    props.favoriteGiphys.forEach((item, i) => {
+      if (!tagsList.includes(item.tag)) tagsList.push(item.tag);
     });
 
+    setCurrentGiphys(selectedGifs);
     setTags(tagsList);
-  }, [props.favoriteGiphys]);
+  }, [props.favoriteGiphys, selectedTag]);
 
   return (
     <>
@@ -34,7 +29,7 @@ const FavoriteGiphyPage = (props) => {
         <div className="auto0 large-label">
           <TextField
             select
-            value={selectedTag || "all-gifs-saved"}
+            value={selectedTag && props.favoriteGiphys.some((x) => x.tag === selectedTag) ? selectedTag : "all-gifs-saved"}
             fullWidth
             variant="standard"
             onChange={(e) => setSelectedTag(e.target.value)}
@@ -50,28 +45,24 @@ const FavoriteGiphyPage = (props) => {
             })}
           </TextField>
         </div>
-        <div className="flex flex-wrap flex-center-x mt-50">
-          {currentGiphys?.map((item, i) => {
-            return (
-              <div key={item.id} className="margin13">
-                <GifCard currentImg={item} searchQuery={item.tag} favorites />
-              </div>
-            );
-          })}
-        </div>
+        {props.favoriteGiphys[0] && currentGiphys[0] && (
+          <>
+            <p className="white-color mt-50">Click on image to remove from favorites</p>
+            <div className="flex flex-wrap flex-center-x">
+              {currentGiphys?.map((item, i) => {
+                return (
+                  <div key={item.id} className="margin13">
+                    <GifCard currentImg={item} searchQuery={item.tag} favorites />
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+        {!props.favoriteGiphys[0] && <div className="white-color">Nothing saved yet</div>}
       </div>
     </>
   );
-
-  //   function getSavedImagesByTag(tag) {
-  //     if (tag === "all-gifs-saved") {
-  //       setCurrentGiphys(props.favoriteGiphys);
-  //     } else {
-  //       const selectedGifs = props.favoriteGiphys.filter((x) => x.tag === tag);
-  //       setCurrentGiphys(selectedGifs);
-  //     }
-  //     setSelectedTag(tag);
-  //   }
 };
 
 const mapStateToProps = (state) => {
